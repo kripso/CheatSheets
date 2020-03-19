@@ -19,26 +19,25 @@
 -- Table structure for table `PET`
 --
 
-DROP TABLE IF EXISTS `PET`;
+DROP TABLE IF EXISTS PET;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `PET`
+CREATE TABLE PET
 (
-  `NAME` varchar
+  NAME varchar
 (20) DEFAULT NULL,
-  `OWNER` varchar
+  OWNER varchar
 (20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+)
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `PET`
 --
 
-LOCK TABLES `PET` WRITE;
+LOCK TABLES PET WRITE;
 /*!40000 ALTER TABLE `PET` DISABLE KEYS */;
-INSERT INTO `
-PET`
+INSERT INTO PET
 VALUES
   ('ELA', 'ROLAND'),
   ('ick', 'Tana'),
