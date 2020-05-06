@@ -1,2 +1,17 @@
 backup.sh
 .*
+__pycache__/RNG_cards_nippard.cpython-38.pyc
+build/RNG_cards_nippard/Analysis-00.toc
+build/RNG_cards_nippard/base_library.zip
+build/RNG_cards_nippard/EXE-00.toc
+build/RNG_cards_nippard/PKG-00.pkg
+build/RNG_cards_nippard/PKG-00.toc
+build/RNG_cards_nippard/PYZ-00.pyz
+build/RNG_cards_nippard/PYZ-00.toc
+build/RNG_cards_nippard/RNG_cards_nippard.exe.manifest
+build/RNG_cards_nippard/Tree-00.toc
+build/RNG_cards_nippard/Tree-01.toc
+build/RNG_cards_nippard/warn-RNG_cards_nippard.txt
+build/RNG_cards_nippard/xref-RNG_cards_nippard.html
+dist/RNG_cards_nippard.exe
+RNG_cards_nippard.spec
