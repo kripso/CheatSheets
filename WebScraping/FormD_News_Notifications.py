@@ -24,7 +24,7 @@ def is_good_response(response):
     return (response.status_code == 200 and content_type is not None and content_type.find('html') > -1)
 
 def log_error(exception):
-    send_notification(exception)
+    send_notification(exception,None)
 
 def get_news(url):
     content = simple_get(url)
@@ -57,16 +57,18 @@ def get_latest_news(headers, text):
         if data['message'] != new_data['message']:
             with open('C:/Users/kripso/Documents/Programing/python_exp/WebScraping/formD_new.json', 'w') as json_file:
                 json.dump(new_data, json_file)
-            send_notification(new_data['message'][0])
+            return new_data['message'][0]
 
-def send_notification(news):
+def send_notification(news,url):
     toast = ToastNotifier()
-    toast.show_toast("FormD T1 News",news,duration=20,icon_path="icon.ico")
-    pass
-
+    toast.show_toast("FormD T1 News",news,duration=20,icon_path=None)
+    
+    
 if __name__ == '__main__':
     url = "https://www.reddit.com/r/FormD/comments/hes1l5/latest_updates/"
     news_headers, news_text = get_news(url)    
-    get_latest_news(news_headers,news_text)
+    message = get_latest_news(news_headers,news_text)
+    if message is not None:
+        send_notification(message,url)
     
 
