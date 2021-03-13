@@ -15,3 +15,6 @@ build/RNG_cards_nippard/warn-RNG_cards_nippard.txt
 build/RNG_cards_nippard/xref-RNG_cards_nippard.html
 dist/RNG_cards_nippard.exe
 RNG_cards_nippard.spec
+/WebScraping/build
+/WebScraping/dist
+/WebScraping/__pycache__
