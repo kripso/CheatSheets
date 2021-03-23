@@ -14,7 +14,9 @@ options.add_argument('--no-sandbox')
 options.add_argument('--ignore-certificate-errors')
 user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
 options.add_argument(f'user-agent={user_agent}')
-driver = webdriver.Chrome(executable_path='D:\Krips\Documents\Programing\python_exp\WebScraping\chromedriver.exe', chrome_options=options)
+
+# driver = webdriver.Chrome(executable_path='D:\Krips\Documents\Programing\python_exp\WebScraping\chromedriver.exe', chrome_options=options)
+driver = webdriver.Chrome(executable_path='/Users/rolandrajcsanyi/Documents/programing/Python/PySnippets/WebScraping/chromedriver', chrome_options=options)
 
 # driver = webdriver.Chrome('D:\Krips\Documents\Programing\python_exp\WebScraping\chromedriver.exe')
 
