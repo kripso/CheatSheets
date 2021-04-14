@@ -4,8 +4,6 @@ import random
 from PIL import Image, ImageDraw
 from cv2 import data
 
-# TODO: calculate Random Frames 10%
-
 
 class VideoExtractor:
     def __init__(self, width=1280, height=1280) -> None:
@@ -24,19 +22,31 @@ class VideoExtractor:
             success, image = video.read()
             aFrame += 1
 
-    def putFixationOnFrame(self):
-        # width = 1280
-        # height = 720
-        # x = 0.44
-        # y = 1-0.32
-        # xCoordinate = width*x
-        # yCoordinate = height*y
+    def putFixationOnFrame(self, frames):
+        for frame in frames:
+            framePath = 'exports\\001\\extracted\\frames\\frame%d.jpg' % frame
+            gazeDataPath = 'exports\\001\\extracted\\gaze_positions%d.csv' % frame
+            image = cv2.imread(framePath)
+            height, width, _ = image.shape
 
-        # image = Image.open("exports\\001Extracted\\frame1.jpg")
-        # draw = ImageDraw.Draw(image)
-        # draw.ellipse((width*x-7, height*y-7, width*x+7, height*y+7), fill="red")
-        # image.save("exports\\001Extracted\\frame.jpg", quality=95)
-        pass
+            image = Image.open(framePath)
+            draw = ImageDraw.Draw(image)
+            with open(gazeDataPath) as gazeData:
+                csv_reader = csv.reader(gazeData, delimiter=',')
+                firstRow = True
+                for row in csv_reader:
+                    if firstRow:
+                        firstRow = False
+                        continue
+
+                    norm_pos_x = float(row[3])
+                    norm_pos_y = 1 - float(row[4])
+                    xCoordinate = width*norm_pos_x
+                    yCoordinate = height*norm_pos_y
+
+                    draw.ellipse((xCoordinate-7, yCoordinate-7, xCoordinate+7, yCoordinate+7), fill="red")
+
+            image.save(framePath[:-4]+'_plus_fixation.jpg', quality=100)
 
 
 class CSVExtractor:
@@ -65,20 +75,24 @@ class CSVExtractor:
             if int(gazePosition[1]) in frames:
                 rows.append(index)
 
-        with open(exportPath+'\\gaze_positions.csv', mode='w', newline='') as gaze_positions:
-            gaze_positions_writer = csv.writer(gaze_positions, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            gaze_positions_writer.writerow(self.columns[0])
+        for frame in frames:
+            with open(exportPath+'\\gaze_positions%d.csv' % frame, mode='w', newline='') as gaze_positions:
+                gaze_positions_writer = csv.writer(gaze_positions, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                gaze_positions_writer.writerow(self.columns[0])
 
-            for index in rows:
-                gaze_positions_writer.writerow(self.data[index])
+                for row in rows:
+                    if frame == int(self.data[row][1]):
+                        gaze_positions_writer.writerow(self.data[row])
 
 
 if __name__ == '__main__':
     csvExtractor = CSVExtractor()
     csvExtractor.readGasePositions()
 
-    numberOfFrames = 10
+    numberOfFrames = 5
     frames = random.sample(range(0, int(csvExtractor.data[len(csvExtractor.data)-1][1])+1), numberOfFrames)
 
     VideoExtractor().retrieveFrames(frames)
     csvExtractor.writeGazePositions(frames)
+
+    VideoExtractor().putFixationOnFrame(frames)
