@@ -10,8 +10,8 @@ class VideoExtractor:
         self.width = width
         self.height = height
 
-    def retrieveFrames(self, frames, path='exports\\001\\world.mp4'):
-        exportPath = 'exports\\001\\extracted\\frames'
+    def retrieveFrames(self, frames, path='exports\\000\\world.mp4'):
+        exportPath = 'exports\\000\\extracted\\frames'
         video = cv2.VideoCapture(path)
         success, image = video.read()
 
@@ -24,8 +24,8 @@ class VideoExtractor:
 
     def putFixationOnFrame(self, frames):
         for frame in frames:
-            framePath = 'exports\\001\\extracted\\frames\\frame%d.jpg' % frame
-            gazeDataPath = 'exports\\001\\extracted\\gaze_positions%d.csv' % frame
+            framePath = 'exports\\000\\extracted\\frames\\frame%d.jpg' % frame
+            gazeDataPath = 'exports\\000\\extracted\\gaze_positions%d.csv' % frame
             image = cv2.imread(framePath)
             height, width, _ = image.shape
 
@@ -54,7 +54,7 @@ class CSVExtractor:
         self.columns = []
         self.data = []
 
-    def readGasePositions(self, path="exports\\001\\gaze_positions.csv"):
+    def readGasePositions(self, path="exports\\000\\gaze_positions.csv"):
         with open(path) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
@@ -68,7 +68,7 @@ class CSVExtractor:
                 line_count += 1
 
     def writeGazePositions(self, frames):
-        exportPath = 'exports\\001\\extracted'
+        exportPath = 'exports\\000\\extracted'
         rows = []
 
         for index, gazePosition in enumerate(self.data):
