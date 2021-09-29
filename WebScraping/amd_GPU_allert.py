@@ -1,6 +1,8 @@
+import sys
 from selenium import webdriver
 import platform
 import smtplib
+from win10toast import ToastNotifier
 
 # user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36'
 browser = None
@@ -18,9 +20,9 @@ options.add_argument('--allow-running-insecure-content')
 options.add_argument(f'user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.50 Safari/537.36')
 
 if (platform.system() == 'Windows'):
-    browser = webdriver.Chrome(executable_path='D:\Krips\Documents\Programing\python_exp\WebScraping\chromedriver.exe', chrome_options=options)
+    browser = webdriver.Chrome(executable_path='D:\Krips\Documents\Programing\python_exp\WebScraping\chromedriver.exe', options=options)
 else:
-    browser = webdriver.Chrome('D:\Krips\Documents\Programing\python_exp\WebScraping\chromedriver', chrome_options=options)
+    browser = webdriver.Chrome('D:\Krips\Documents\Programing\python_exp\WebScraping\chromedriver', options=options)
 
 
 def sendSmtpEmail(to, message):
@@ -64,8 +66,8 @@ def productParser():
             RX_6800XT = products[div].text
         if 'AMD RYZEN™ 9 5900X Processor' in products[div].text:
             RYZEN_9_5900X = products[div].text
-        # if "AMD RYZEN™ 7 5800X Processor" in products[div].text:
-        #     RYZEN_7_5800X = products[div].text
+        if "AMD Radeon™ RX 6900 XT Graphics" in products[div].text:
+            RX_6900XT = products[div].text
 
     # print(RX_6800_XT)
     # print(RYZEN_9_5900X)
@@ -74,6 +76,9 @@ def productParser():
 
     if "Out of Stock" not in RX_6800XT:
         messages.append(radeonInStock('RX 6800XT'))
+
+    if "Out of Stock" not in RX_6900XT:
+        messages.append(radeonInStock('RX 6900XT'))
 
     if "Out of Stock" not in RYZEN_9_5900X:
         messages.append(ryzenInStock('RYZEN 9 5900X'))
@@ -93,5 +98,8 @@ if __name__ == '__main__':
     if messages:
         for message in messages:
             sendSmtpEmail('kripsoworld@gmail.com', message)
+            toaster = ToastNotifier()
+            toaster.show_toast("StockUpdate", message)
 
     browser.close()
+    browser.quit()
