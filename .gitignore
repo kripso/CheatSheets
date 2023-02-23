@@ -19,3 +19,5 @@ RNG_cards_nippard.spec
 /WebScraping/dist
 /WebScraping/__pycache__
 /screenshots
+output
+*.exe

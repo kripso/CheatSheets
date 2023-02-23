@@ -2,7 +2,7 @@
 # example of calling submit with a function call
 from time import sleep
 from random import random
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from concurrent.futures import as_completed
 
 # custom task that will sleep for a variable amount of time
@@ -19,6 +19,11 @@ def main():
     paths = ["path1", "path2", "path3", "path4"]
     # start the process pool
     with ProcessPoolExecutor(max_workers=4) as executor:
+        # submit the task
+        futures = {executor.submit(task, path): path for path in paths}
+        # get the result
+        results = [future.result() for future in as_completed(futures)]
+    with ThreadPoolExecutor(max_workers=4) as executor:
         # submit the task
         futures = {executor.submit(task, path): path for path in paths}
         # get the result
