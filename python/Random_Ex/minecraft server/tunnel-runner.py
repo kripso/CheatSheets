@@ -1,3 +1,22 @@
+# https://github.com/TomSchimansky/CustomTkinter
+# import tkinter
+# import customtkinter
+
+# customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
+# customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
+
+# app = customtkinter.CTk()  # create CTk window like you do with the Tk window
+# app.geometry("400x240")
+
+# def button_function():
+#     print("button pressed")
+
+# # Use CTkButton instead of tkinter Button
+# button = customtkinter.CTkButton(master=app, text="CTkButton", command=button_function)
+# button.place(relx=0.5, rely=0.5, anchor=tkinter.CENTER)
+
+# app.mainloop()
+
 from nextcloud import NextCloud
 import subprocess
 import os
@@ -31,45 +50,53 @@ NEXTCLOUD_URL = "https://nextcloud.kripso-world.com/"
 NEXTCLOUD_USERNAME = 'minecraft'
 NEXTCLOUD_PASSWORD = 'konomuti-mc-42'
 
-nxc = NextCloud(endpoint=NEXTCLOUD_URL, user=NEXTCLOUD_USERNAME, password=NEXTCLOUD_PASSWORD)
-mods = nxc.list_folders('/458ca755-495d-40e2-9cc9-437a9389e244/mods', depth=1, all_properties=True)
-datapacks = nxc.list_folders('/458ca755-495d-40e2-9cc9-437a9389e244/datapacks', depth=1, all_properties=True)
+remote_storage = NextCloud(endpoint=NEXTCLOUD_URL, user=NEXTCLOUD_USERNAME, password=NEXTCLOUD_PASSWORD)
+mods = remote_storage.list_folders('/458ca755-495d-40e2-9cc9-437a9389e244/mods', depth=1, all_properties=True)
+datapacks = remote_storage.list_folders('/458ca755-495d-40e2-9cc9-437a9389e244/datapacks', depth=1, all_properties=True)
 
+def print_separator(message: str, lenght: int = 30):
+    print()
+    print('-'*lenght, f'{message}', '-'*lenght)
+    print()
 
-def file_diff_download(path: str, nxt_files) -> None:
+def check_local_file(local_files, remote_file_stripped):
+    remote_file_name = re.split(r'\d?\W\d', remote_file_stripped)[0]
+    local_file = local_files[remote_file_name]
+
+    if remote_file_name in local_files.keys() and remote_file_stripped != local_file:
+        os.remove(local_file)
+        print(f'{local_file} -> removed')
+
+def check_remote_file(remote_file, remote_file_stripped):
+    try:
+        print(remote_file_stripped, end = ' -> ')
+        remote_file.download()
+        print('downloaded')
+    except Exception as err:
+        print(err)
+
+def file_diff_download(path: str, remote_files) -> None:
     os.makedirs(f'{MINECRAFT_PATH}/{path}', exist_ok=True)
     os.chdir(f'{MINECRAFT_PATH}/{path}')
 
-    active_files = {re.split(r'\d?\W\d', item)[0]: item for item in os.listdir()}
+    local_files = {re.split(r'\d?\W\d', item)[0]: item for item in os.listdir()}
 
-    for file in nxt_files.data:
-        if not file.href.endswith(f'/{path}/'):
-            try:
-                active_file = file.href.replace(f'{WEBDAV_PREFIX}/minecraft/{SERVER_NAME}/{path}/', '')
-                file_name = re.split(r'\d?\W\d', active_file)[0]
-                if file_name in active_files.keys() and active_file != active_files[file_name]:
-                    os.remove(active_files[file_name])
-                    print(f'{active_file} -> removed')
-                print(active_file, end = ' -> ')
-                file.download()
-                print('downloaded')
-            except Exception as err:
-                print(err)
+    for remote_file in remote_files.data:
+        if not remote_file.href.endswith(f'/{path}/'):
+            remote_file_stripped = remote_file.href.replace(f'{WEBDAV_PREFIX}/minecraft/{SERVER_NAME}/{path}/', '')
+            check_local_file(local_files, remote_file_stripped)
+            check_remote_file(remote_file, remote_file_stripped)
     os.chdir(ACTIVE_DIR)
 
 
-print()
-print('-'*25, 'checking mods', '-'*25)
-print()
+print_separator('checking mods')
 if mods.is_ok:
     file_diff_download('mods', mods)
 else:
     print('download mods manualy at: https://nextcloud.kripso-world.com/s/KnTY3RR9J98QWq5')
 
 
-print()
-print('-'*25, 'checking datapacks', '-'*25)
-print()
+print_separator('checking datapacks')
 if datapacks.is_ok:
     file_diff_download('datapacks', datapacks)
 else:
@@ -79,10 +106,7 @@ else:
 #
 # Tunnels
 #
-print()
-print('-'*25, 'routing tunnels', '-'*25)
-print()
-
+print_separator('routing tunnels')
 commands = [
     f'cmd /c "{ACTIVE_DIR}/cloudflared.exe" access tcp --hostname minecraft-server.kripso-world.com --url localhost:23423',
     f'cmd /c "{ACTIVE_DIR}/cloudflared.exe" access tcp --hostname minecraft-modded.kripso-world.com --url localhost:23424',
